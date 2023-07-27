@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 function UserProfile() {
   const [user, setUser] = useState({});
   const { userId } = useParams();
+  const history = useHistory();
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -30,14 +31,18 @@ function UserProfile() {
     </div>
   ));
 
-  const deleteHandler = (event) => {
-    // This will be successful but will not actually delete the user.
-    fetch(
-      `https://jsonplaceholder.typicode.com/users/${userId}`,
-      { method: "DELETE" } // the delete method tells the API to delete the user
-    )
-      .then((response) => response.json())
-      .then((data) => console.log("deleteHandler is not fully implemented"));
+  const deleteHandler = async () => {
+    try {
+      // Send a DELETE request to the API to delete the user
+      await fetch(`https://jsonplaceholder.typicode.com/users/${userId}`, {
+        method: "DELETE",
+      });
+
+      // If the delete was successful, redirect the user to the homepage
+      history.push("/");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (user.id) {
@@ -50,6 +55,7 @@ function UserProfile() {
       </div>
     );
   }
+
   return "Loading...";
 }
 
